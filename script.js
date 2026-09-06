@@ -853,11 +853,6 @@
     activeSheet.classList.remove('open');
     backdrop.classList.remove('open');
     document.body.style.overflow = '';
-    document.querySelectorAll('.nav-btn').forEach(b=>{
-      const isDefault = b.dataset.openSheet === 'colors';
-      b.classList.toggle('active', isDefault);
-      b.setAttribute('aria-pressed', isDefault ? 'true':'false');
-    });
     document.removeEventListener('keydown', focusTrapHandler);
     const trigger = lastTrigger;
     activeSheet = null;
