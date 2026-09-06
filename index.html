@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Gradient — a color tool</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="app">
+
+  <header class="topbar">
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs>
+          <linearGradient id="logoGrad" x1="2" y1="30" x2="30" y2="2" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#FF6B6B"/>
+            <stop offset="0.5" stop-color="#5E9EFF"/>
+            <stop offset="1" stop-color="#8B5EFF"/>
+          </linearGradient>
+        </defs>
+        <rect x="2" y="2" width="28" height="28" rx="9" fill="url(#logoGrad)"/>
+      </svg>
+      <span class="brand-name">Gradient<span class="thin"> — a color tool</span></span>
+    </div>
+    <div class="topbar-actions">
+      <button class="icon-btn" id="undoBtn" title="Undo" aria-label="Undo last change">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-15-6.7L3 13"/></svg>
+      </button>
+      <button class="icon-btn" id="randomBtn" title="Randomize" aria-label="Randomize gradient">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5"/><path d="M4 20 21 3"/><path d="M21 16v5h-5"/><path d="M15 15l6 6"/><path d="M4 4l5 5"/></svg>
+      </button>
+      <button class="icon-btn" id="aboutBtn" data-open-sheet="about" title="About &amp; shortcuts" aria-label="About and keyboard shortcuts">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5"/><path d="M12 8h.01"/></svg>
+      </button>
+      <div class="export-nav" id="exportNav">
+        <button class="export-nav-btn" id="exportNavBtn" aria-haspopup="true" aria-expanded="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+          Export
+        </button>
+        <div class="export-menu" id="exportMenu" role="menu" aria-label="Export image format">
+          <button type="button" role="menuitem" data-fmt="png">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+            PNG
+          </button>
+          <button type="button" role="menuitem" data-fmt="jpeg">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+            JPEG
+          </button>
+          <button type="button" role="menuitem" data-fmt="svg">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+            SVG
+          </button>
+          <button type="button" role="menuitem" data-fmt="webp">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+            WebP
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <div class="canvas-wrap">
+      <div id="canvas" role="img" aria-label="Gradient preview">
+        <div class="angle-dial" id="angleDial" tabindex="0" role="slider" aria-label="Gradient angle" aria-valuemin="0" aria-valuemax="360" aria-valuenow="90"></div>
+      </div>
+    </div>
+
+    <aside class="rail" aria-label="Gradient controls">
+
+      <div class="rail-section">
+        <div class="rail-heading">Canvas</div>
+        <div class="segmented" id="ratioSegDesktop" role="tablist" aria-label="Canvas ratio"></div>
+      </div>
+
+      <div class="rail-section">
+        <div class="rail-heading">Type</div>
+        <div class="segmented" id="typeSegDesktop" role="tablist" aria-label="Gradient type"></div>
+      </div>
+
+      <div class="rail-section">
+        <div class="rail-heading">Colors</div>
+        <div id="stopListDesktop" class="stop-list"></div>
+        <button class="add-stop-btn" data-add-stop>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          Add color
+        </button>
+      </div>
+
+      <div class="rail-section" id="adjustSectionDesktop"></div>
+
+      <div class="rail-section">
+        <div class="rail-heading">Presets</div>
+        <div class="preset-grid" id="presetGridDesktop"></div>
+        <button class="save-preset-btn" data-save-preset>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>
+          Save current
+        </button>
+      </div>
+
+      <div class="rail-section">
+        <div class="rail-heading">Export</div>
+        <div id="exportSectionDesktop"></div>
+      </div>
+
+    </aside>
+  </main>
+
+  <nav class="bottom-nav" aria-label="Editor panels">
+    <div class="nav-pill">
+      <button class="nav-btn" data-open-sheet="colors">Colors</button>
+      <button class="nav-btn" data-open-sheet="type">Type</button>
+      <button class="nav-btn" data-open-sheet="presets">Presets</button>
+      <button class="nav-btn" data-open-sheet="export">Export</button>
+    </div>
+  </nav>
+
+  <div class="overlay-backdrop" id="backdrop"></div>
+
+  <div class="sheet mobile-panel" id="sheet-colors" role="dialog" aria-modal="true" aria-labelledby="sheet-colors-title">
+    <div class="sheet-header">
+      <span class="sheet-title" id="sheet-colors-title">Colors</span>
+      <button class="sheet-close" data-close-sheet aria-label="Close">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="sheet-body">
+      <div id="stopListMobile" class="stop-list"></div>
+      <button class="add-stop-btn" data-add-stop>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        Add color
+      </button>
+    </div>
+  </div>
+
+  <div class="sheet mobile-panel" id="sheet-type" role="dialog" aria-modal="true" aria-labelledby="sheet-type-title">
+    <div class="sheet-header">
+      <span class="sheet-title" id="sheet-type-title">Type &amp; adjust</span>
+      <button class="sheet-close" data-close-sheet aria-label="Close">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="sheet-body">
+      <div>
+        <span class="field-label">Canvas ratio</span>
+        <div class="segmented" id="ratioSegMobile" role="tablist" aria-label="Canvas ratio"></div>
+      </div>
+      <div>
+        <span class="field-label">Gradient type</span>
+        <div class="segmented" id="typeSegMobile" role="tablist" aria-label="Gradient type"></div>
+      </div>
+      <div id="adjustSectionMobile"></div>
+    </div>
+  </div>
+
+  <div class="sheet mobile-panel" id="sheet-presets" role="dialog" aria-modal="true" aria-labelledby="sheet-presets-title">
+    <div class="sheet-header">
+      <span class="sheet-title" id="sheet-presets-title">Presets</span>
+      <button class="sheet-close" data-close-sheet aria-label="Close">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="sheet-body">
+      <div class="preset-grid" id="presetGridMobile"></div>
+      <button class="save-preset-btn" data-save-preset>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>
+        Save current
+      </button>
+    </div>
+  </div>
+
+  <div class="sheet mobile-panel" id="sheet-export" role="dialog" aria-modal="true" aria-labelledby="sheet-export-title">
+    <div class="sheet-header">
+      <span class="sheet-title" id="sheet-export-title">Export</span>
+      <button class="sheet-close" data-close-sheet aria-label="Close">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="sheet-body" id="exportSectionMobile"></div>
+  </div>
+
+  <div class="sheet" id="sheet-about" role="dialog" aria-modal="true" aria-labelledby="sheet-about-title">
+    <div class="sheet-header">
+      <span class="sheet-title" id="sheet-about-title">About &amp; shortcuts</span>
+      <button class="sheet-close" data-close-sheet aria-label="Close">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="sheet-body">
+      <p class="about-desc">A focused tool for building linear, radial, and conic gradients — drag stops on the canvas, fine-tune with sliders, then export as CSS, Tailwind, SwiftUI, SVG, or PNG.</p>
+      <div class="about-footer">
+        <div class="social-row">
+          <a class="social-icon" href="https://github.com/rajpolu" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.73.5.75 5.48.75 11.75c0 5.02 3.26 9.28 7.78 10.78.57.1.78-.25.78-.55 0-.27-.01-1.16-.02-2.1-3.17.69-3.84-1.35-3.84-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.75 1.18 1.75 1.18 1.02 1.75 2.68 1.24 3.33.95.1-.74.4-1.24.72-1.53-2.53-.29-5.19-1.27-5.19-5.63 0-1.24.44-2.26 1.17-3.06-.12-.29-.51-1.46.11-3.04 0 0 .96-.31 3.14 1.17a10.9 10.9 0 0 1 5.72 0c2.18-1.48 3.14-1.17 3.14-1.17.62 1.58.23 2.75.11 3.04.73.8 1.17 1.82 1.17 3.06 0 4.37-2.67 5.34-5.21 5.62.41.36.77 1.06.77 2.14 0 1.55-.01 2.79-.01 3.17 0 .3.2.66.79.55A11.26 11.26 0 0 0 23.25 11.75C23.25 5.48 18.27.5 12 .5Z"/></svg>
+          </a>
+          <a class="social-icon" href="https://x.com/rajpolu" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.9 2.25h3.07l-6.71 7.67 7.9 10.83h-6.18l-4.84-6.53-5.54 6.53H3.53l7.18-8.2L3.15 2.25h6.34l4.37 5.96 5.04-5.96Zm-1.08 16.68h1.7L7.9 4.02H6.08l11.74 14.91Z"/></svg>
+          </a>
+          <a class="social-icon" href="https://linkedin.com/in/rajpolu" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.02-3.03-1.85-3.03-1.85 0-2.14 1.45-2.14 2.94v5.66H9.36V9h3.41v1.56h.05c.47-.89 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29ZM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12ZM7.12 20.45H3.56V9h3.56v11.45Z"/></svg>
+          </a>
+        </div>
+        <a class="credit-link" href="https://github.com/rajpolu" target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.73.5.75 5.48.75 11.75c0 5.02 3.26 9.28 7.78 10.78.57.1.78-.25.78-.55 0-.27-.01-1.16-.02-2.1-3.17.69-3.84-1.35-3.84-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.75 1.18 1.75 1.18 1.02 1.75 2.68 1.24 3.33.95.1-.74.4-1.24.72-1.53-2.53-.29-5.19-1.27-5.19-5.63 0-1.24.44-2.26 1.17-3.06-.12-.29-.51-1.46.11-3.04 0 0 .96-.31 3.14 1.17a10.9 10.9 0 0 1 5.72 0c2.18-1.48 3.14-1.17 3.14-1.17.62 1.58.23 2.75.11 3.04.73.8 1.17 1.82 1.17 3.06 0 4.37-2.67 5.34-5.21 5.62.41.36.77 1.06.77 2.14 0 1.55-.01 2.79-.01 3.17 0 .3.2.66.79.55A11.26 11.26 0 0 0 23.25 11.75C23.25 5.48 18.27.5 12 .5Z"/></svg>
+          Built by RajPolu
+        </a>
+      </div>
+      <div class="shortcut-list">
+        <div class="shortcut-row"><span>Undo</span><span class="kbd-group"><kbd>⌘</kbd><kbd>Z</kbd></span></div>
+        <div class="shortcut-row"><span>Redo</span><span class="kbd-group"><kbd>⇧</kbd><kbd>⌘</kbd><kbd>Z</kbd></span></div>
+        <div class="shortcut-row"><span>Randomize gradient</span><span class="kbd-group"><kbd>⌘</kbd><kbd>R</kbd></span></div>
+        <div class="shortcut-row"><span>Add color stop</span><span class="kbd-group"><kbd>⇧</kbd><kbd>⌘</kbd><kbd>A</kbd></span></div>
+        <div class="shortcut-row"><span>Save current as preset</span><span class="kbd-group"><kbd>⌘</kbd><kbd>S</kbd></span></div>
+        <div class="shortcut-row"><span>Show shortcuts</span><span class="kbd-group"><kbd>⌘</kbd><kbd>/</kbd></span></div>
+        <div class="shortcut-row"><span>Close overlay</span><span class="kbd-group"><kbd>Esc</kbd></span></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+  <div id="sr-live" class="visually-hidden" aria-live="polite"></div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
