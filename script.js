@@ -83,6 +83,21 @@
   function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
   function sortedStops(){ return [...state.stops].sort((a,b)=>a.pos-b.pos); }
 
+  function colorAtStop(position){
+    const stops = sortedStops();
+    const next = stops.find(s=>s.pos >= position) || stops[stops.length-1];
+    const prev = [...stops].reverse().find(s=>s.pos <= position) || stops[0];
+    if(next === prev) return next.color;
+    const t = (position - prev.pos) / (next.pos - prev.pos);
+    const hex = color => {
+      const value = color.replace('#','');
+      const normalized = value.length === 3 ? value.split('').map(c=>c+c).join('') : value;
+      return [0,2,4].map(i=>parseInt(normalized.slice(i,i+2),16));
+    };
+    const from = hex(prev.color), to = hex(next.color);
+    return '#' + from.map((channel,i)=>Math.round(channel + (to[i]-channel)*t).toString(16).padStart(2,'0')).join('');
+  }
+
   function buildCSSGradient(){
     const stops = sortedStops().map(s => `${s.color} ${Math.round(s.pos)}%`).join(', ');
     if(state.type === 'linear'){
@@ -704,9 +719,33 @@
       const stops = sortedStopsWithId();
       const stopEls = stops.map(s=>`  <stop offset="${Math.round(s.pos)}%" stop-color="${s.color}"/>`).join('\n');
       if(state.type === 'radial'){
-        return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">\n <defs><clipPath id="clip"><rect width="${width}" height="${height}" rx="${radius}"/></clipPath></defs>\n <radialGradient id="g" cx="${state.radialPos.x}%" cy="${state.radialPos.y}%" r="75%">\n${stopEls}\n </radialGradient>\n <rect width="100%" height="100%" fill="url(#g)" clip-path="url(#clip)"/>\n</svg>`;
+        const cx = width * state.radialPos.x / 100;
+        const cy = height * state.radialPos.y / 100;
+        const radiusX = Math.max(cx, width-cx);
+        const radiusY = Math.max(cy, height-cy);
+        const radiusValue = state.radialShape === 'ellipse' ? radiusX : Math.hypot(radiusX, radiusY);
+        const transform = state.radialShape === 'ellipse' ? ` gradientTransform="translate(${cx} ${cy}) scale(1 ${radiusY/radiusX}) translate(${-cx} ${-cy})"` : '';
+        return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">\n <defs><clipPath id="clip"><rect width="${width}" height="${height}" rx="${radius}"/></clipPath><radialGradient id="g" gradientUnits="userSpaceOnUse" cx="${cx}" cy="${cy}" r="${radiusValue}"${transform}>\n${stopEls}\n </radialGradient></defs>\n <rect width="${width}" height="${height}" fill="url(#g)" clip-path="url(#clip)"/>\n</svg>`;
       }
-      return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">\n <defs><clipPath id="clip"><rect width="${width}" height="${height}" rx="${radius}"/></clipPath></defs>\n <linearGradient id="g" gradientTransform="rotate(${Math.round(state.angle)})">\n${stopEls}\n </linearGradient>\n <rect width="100%" height="100%" fill="url(#g)" clip-path="url(#clip)"/>\n</svg>`;
+      if(state.type === 'conic'){
+        const cx = width * state.conicPos.x / 100;
+        const cy = height * state.conicPos.y / 100;
+        const r = Math.hypot(width, height);
+        const wedges = Array.from({length:360}, (_,i)=>{
+          const start = (state.angle - 90 + i) * Math.PI / 180;
+          const end = (state.angle - 90 + i + 1) * Math.PI / 180;
+          const x1 = cx + Math.cos(start)*r, y1 = cy + Math.sin(start)*r;
+          const x2 = cx + Math.cos(end)*r, y2 = cy + Math.sin(end)*r;
+          return `<path d="M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 0 1 ${x2} ${y2} Z" fill="${colorAtStop(i/360*100)}"/>`;
+        }).join('');
+        return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">\n <defs><clipPath id="clip"><rect width="${width}" height="${height}" rx="${radius}"/></clipPath></defs>\n <g clip-path="url(#clip)">${wedges}</g>\n</svg>`;
+      }
+      const rad = state.angle * Math.PI / 180;
+      const dx = Math.sin(rad), dy = -Math.cos(rad);
+      const len = Math.abs(width*dx) + Math.abs(height*dy);
+      const x1 = width/2 - dx*len/2, y1 = height/2 - dy*len/2;
+      const x2 = width/2 + dx*len/2, y2 = height/2 + dy*len/2;
+      return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">\n <defs><clipPath id="clip"><rect width="${width}" height="${height}" rx="${radius}"/></clipPath><linearGradient id="g" gradientUnits="userSpaceOnUse" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}">\n${stopEls}\n </linearGradient></defs>\n <rect width="${width}" height="${height}" fill="url(#g)" clip-path="url(#clip)"/>\n</svg>`;
     }
     return css;
   }
