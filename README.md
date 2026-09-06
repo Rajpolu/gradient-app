@@ -1,6 +1,6 @@
 # Gradient — a color tool
 
-A focused tool for building linear, radial, and conic gradients — drag stops on the canvas, fine-tune with sliders, then export as CSS, Tailwind, SwiftUI, SVG, or an image.
+Create and export beautiful linear, radial, and conic gradients in the browser. Drag color stops on the canvas, fine-tune the gradient, choose a canvas ratio, and export as CSS, Tailwind, SwiftUI, SVG, PNG, JPEG, or WebP.
 
 ## Files
 
@@ -15,5 +15,9 @@ Just open `index.html` in a browser, or serve the folder with any static server,
 ```
 npx serve .
 ```
+
+## Keywords
+
+gradient generator, CSS gradients, color tool, gradient editor, linear gradient, radial gradient, conic gradient, Tailwind CSS, SVG export
 
 Built by RajPolu — https://github.com/rajpolu
